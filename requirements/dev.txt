@@ -1,0 +1,9 @@
+black
+flake8
+isort
+mypy
+pytest
+httpx
+fastapi
+uvicorn
+starlette~=0.16.0
