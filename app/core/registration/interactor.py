@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Callable
 
 from app.core.repository import IRepository
+from app.core.user.user import User
 from app.infra.fastapi.responses import RegistrationResponse
 
 
@@ -19,7 +20,8 @@ class RegistrationInteractor:
     def set_api_key_function(self, new_func: Callable[[str], str]) -> None:
         self.api_key_fn = new_func
 
-    def register_user(self) -> RegistrationResponse:
+    def register_user(self, user_name: str) -> RegistrationResponse:
         api_key = self.api_key_fn("ragaca")
-        self.repository.register_user(api_key)
-        return RegistrationResponse(api_key)
+        user = User(user_name, api_key)
+        self.repository.register_user(user)
+        return RegistrationResponse(user_name, api_key)
