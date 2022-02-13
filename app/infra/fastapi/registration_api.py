@@ -9,7 +9,7 @@ uid = "register"
 registration_api = APIRouter(prefix=f"/{uid}", tags=[uid])
 
 
-@registration_api.post(path="/register/{user_name}")
+@registration_api.post(path="/register/")
 def register_user(
     user_name: str, core: BitcoinWalletService = Depends(get_core)
 ) -> RegistrationResponse:

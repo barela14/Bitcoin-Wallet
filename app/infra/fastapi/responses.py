@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, List
 
-from app.core.user.user import BitcoinWallet
+from app.core.user.user import BitcoinWallet, Transaction
 
 SUCCESS_CODE = 0
 FAILURE_CODE = 1
@@ -16,15 +16,6 @@ class Response:
     status_message: str = SUCCESS_MESSAGE
 
 
-# T = TypeVar("T")
-#
-#
-# @dataclass
-# class Result(Generic[T]):
-#     object: T
-#     response: Response
-
-
 @dataclass
 class RegistrationResponse:
     name: str
@@ -33,6 +24,13 @@ class RegistrationResponse:
 
 @dataclass
 class CreateWalletResponse:
+    status_code: int
+    status_message: str
+    args: Optional[BitcoinWallet] = None
+
+
+@dataclass
+class GetWalletResponse:
     status_code: int
     status_message: str
     args: Optional[BitcoinWallet] = None
@@ -52,6 +50,23 @@ class CreateWalletResponseWrapper:
     args: Optional[BitcoinWalletWrapper] = None
 
 
-# class WalletResponseWrapper:
-#     response: Optional[CreateWalletResponse]
-#     error: Optional[Response]
+@dataclass
+class GetWalletResponseWrapper:
+    status_code: int
+    status_message: str
+    args: Optional[BitcoinWalletWrapper] = None
+
+
+@dataclass
+class GetTransactionResponse:
+    status_code: int
+    status_message: str
+    args: Optional[List[Transaction]] = None
+
+
+@dataclass
+class GetStatisticsResponse:
+    status_code: int
+    status_message: str
+    num_transactions: Optional[int] = None
+    total_profit: Optional[float] = None
