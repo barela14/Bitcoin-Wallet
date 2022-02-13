@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass
@@ -11,4 +12,4 @@ class User:
 class BitcoinWallet:
     address: str
     balance: float
-    user_id: int
+    user_id: Optional[int] = None

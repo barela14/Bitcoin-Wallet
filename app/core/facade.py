@@ -3,7 +3,10 @@ from dataclasses import dataclass
 from app.core.registration.interactor import RegistrationInteractor
 from app.core.repository import IRepository
 from app.core.user.interactor import UserInteractor
-from app.infra.fastapi.responses import CreateWalletResponse, RegistrationResponse
+from app.infra.fastapi.responses import (
+    CreateWalletResponseWrapper,
+    RegistrationResponse,
+)
 
 
 @dataclass
@@ -14,7 +17,7 @@ class BitcoinWalletService:
     def register_user(self, user_name: str) -> RegistrationResponse:
         return self.register_interactor.register_user(user_name)
 
-    def create_wallet(self, api_key: str) -> CreateWalletResponse:
+    def create_wallet(self, api_key: str) -> CreateWalletResponseWrapper:
         return self.user_iteractor.create_wallet(api_key)
 
     @classmethod

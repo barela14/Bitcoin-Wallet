@@ -1,9 +1,10 @@
 import sqlite3
 from contextlib import contextmanager
 from sqlite3 import Cursor
-from typing import Generator, List
+from typing import Generator, List, Optional
 
 from app.core.user.user import BitcoinWallet, User
+from app.infra.fastapi.responses import CreateWalletResponse
 
 
 class SQLiteRepository:
@@ -49,32 +50,47 @@ class SQLiteRepository:
                 );"""
             )
 
-    def get_user_id_by_api_key(self, api_key: str) -> int:
+    def get_user_id_by_api_key(self, api_key: str) -> Optional[int]:
         with self.open_db() as cursor:
             command = """SELECT user_id FROM users WHERE api_key = ?;"""
             args = (api_key,)
             cursor.execute(command, args)
             user_id = cursor.fetchone()
+        if user_id is None:
+            return None
         return int(user_id[0])
 
     def create_wallet(
-        self, address: str, starting_deposit: float, api_key: str
-    ) -> BitcoinWallet:
+            self, address: str, starting_deposit: float, api_key: str
+    ) -> CreateWalletResponse:
         user_id = self.get_user_id_by_api_key(api_key)
+
+        if user_id is None:
+            return CreateWalletResponse(1, "Invalid api_key", None)
 
         with self.open_db() as cursor:
             command = (
                 """INSERT INTO wallets(address, balance, user_id) VALUES(?,?,?);"""
             )
-            args = (address, starting_deposit, user_id)
+            args = (address, starting_deposit, int(user_id))
             cursor.execute(command, args)
             last_row_id = cursor.lastrowid
-            command = """SELECT * FROM wallets where rowid = ?;"""
-            args = (last_row_id,)
-            cursor.execute(command, args)
+            command = """SELECT * FROM wallets where rowid = (?);"""
+            args2 = (last_row_id,)
+            cursor.execute(command, args2)
             row = cursor.fetchone()
 
-        return BitcoinWallet(row[0], row[1], row[2])
+        if not row:
+            return CreateWalletResponse(0, "Couldn't create wallet", None)
+        return CreateWalletResponse(200, "OK", BitcoinWallet(row[1], row[2], row[3]))
+
+    def num_wallets_by_user_id(self, user_id: int) -> int:
+        with self.open_db() as cursor:
+            command = """SELECT * FROM wallets WHERE user_id = ?;"""
+            args = (user_id,)
+            cursor.execute(command, args)
+            rows = cursor.fetchall()
+        return len(rows)
 
     def get_wallets_by_user_id(self, user_id: int) -> List[BitcoinWallet]:
         wallets = []
@@ -85,6 +101,6 @@ class SQLiteRepository:
             rows = cursor.fetchall()
 
         for row in rows:
-            wallets.append(BitcoinWallet(row[0], row[1], row[2]))
+            wallets.append(BitcoinWallet(row[1], row[2], row[3]))
 
         return wallets
