@@ -1,6 +1,6 @@
 from typing import List, Optional, Protocol
 
-from app.core.user.user import BitcoinWallet, User, Transaction
+from app.core.user.user import BitcoinWallet, Transaction, User
 from app.infra.fastapi.responses import (
     CreateWalletResponse,
     GetWalletResponse,

@@ -3,7 +3,7 @@ from contextlib import contextmanager
 from sqlite3 import Cursor
 from typing import Generator, List, Optional
 
-from app.core.user.user import BitcoinWallet, User, Transaction
+from app.core.user.user import BitcoinWallet, Transaction, User
 from app.infra.fastapi.responses import (
     CreateWalletResponse,
     GetWalletResponse,
@@ -78,7 +78,7 @@ class SQLiteRepository:
         return int(user_id[0])
 
     def create_wallet(
-            self, address: str, starting_deposit: float, api_key: str
+        self, address: str, starting_deposit: float, api_key: str
     ) -> CreateWalletResponse:
         user_id = self.get_user_id_by_api_key(api_key)
 
@@ -143,12 +143,12 @@ class SQLiteRepository:
         return Response(200, "OK")
 
     def register_transaction(
-            self,
-            address_from: str,
-            address_to: str,
-            amount: float,
-            user_id_from: int,
-            user_id_to: int,
+        self,
+        address_from: str,
+        address_to: str,
+        amount: float,
+        user_id_from: int,
+        user_id_to: int,
     ) -> Response:
         with self.open_db() as cursor:
             command = """INSERT INTO
@@ -184,11 +184,13 @@ class SQLiteRepository:
         with self.open_db() as cursor:
             command = """SELECT COUNT(*) FROM transactions"""
             cursor.execute(command)
-            return cursor.fetchone()[0]
+            return int(cursor.fetchone()[0])
 
     def get_foreign_transactions_amount(self) -> float:
         with self.open_db() as cursor:
-            command = """SELECT amount FROM transactions WHERE user_id_from != user_id_to"""
+            command = (
+                """SELECT amount FROM transactions WHERE user_id_from != user_id_to"""
+            )
             cursor.execute(command)
             rows = cursor.fetchall()
         amount: float = 0

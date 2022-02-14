@@ -6,10 +6,11 @@ from app.core.repository import IRepository
 from app.core.user.interactor import UserInteractor
 from app.infra.fastapi.responses import (
     CreateWalletResponseWrapper,
+    GetStatisticsResponse,
+    GetTransactionResponse,
+    GetWalletResponseWrapper,
     RegistrationResponse,
     Response,
-    GetWalletResponseWrapper,
-    GetTransactionResponse, GetStatisticsResponse,
 )
 
 
@@ -51,6 +52,5 @@ class BitcoinWalletService:
         return cls(
             register_interactor=RegistrationInteractor(repository),
             user_interactor=UserInteractor(repository),
-            admin_interactor=AdminInteractor(repository)
+            admin_interactor=AdminInteractor(repository),
         )
-

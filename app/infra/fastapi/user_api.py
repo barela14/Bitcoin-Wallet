@@ -4,9 +4,9 @@ from app.core.facade import BitcoinWalletService
 from app.infra.fastapi.dependables import get_core
 from app.infra.fastapi.responses import (
     CreateWalletResponseWrapper,
-    Response,
-    GetWalletResponseWrapper,
     GetTransactionResponse,
+    GetWalletResponseWrapper,
+    Response,
 )
 
 uid = "user"

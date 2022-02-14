@@ -5,12 +5,13 @@ from typing import Callable, Set
 
 from app.core.repository import IRepository
 from app.core.user.user import Transaction
+from app.infra.coin_market_cap_api.bitcoin_api import CoinCapMarket
 from app.infra.fastapi.responses import (
     BitcoinWalletWrapper,
     CreateWalletResponseWrapper,
+    GetTransactionResponse,
     GetWalletResponseWrapper,
     Response,
-    GetTransactionResponse,
 )
 
 
@@ -23,6 +24,9 @@ class UserInteractor:
     repository: IRepository
     starting_deposit: float = 1.0
     address_fn: Callable[[str], str] = simple_address_generator
+
+    def __post_init__(self) -> None:
+        self.market = CoinCapMarket()
 
     def create_wallet(self, api_key: str) -> CreateWalletResponseWrapper:
         user_id = self.repository.get_user_id_by_api_key(api_key)
@@ -37,7 +41,10 @@ class UserInteractor:
 
         args = wallet_result.args
         assert args is not None
-        new_args = BitcoinWalletWrapper(args.address, args.balance, 7)
+        self.market.connect()
+        new_args = BitcoinWalletWrapper(
+            args.address, args.balance, args.balance * self.market.get_coin_price()
+        )
         return CreateWalletResponseWrapper(
             wallet_result.status_code, wallet_result.status_message, new_args
         )
@@ -55,7 +62,10 @@ class UserInteractor:
             )
 
         assert args is not None
-        new_args = BitcoinWalletWrapper(args.address, args.balance, 8)
+        self.market.connect()
+        new_args = BitcoinWalletWrapper(
+            args.address, args.balance, args.balance * self.market.get_coin_price()
+        )
         return GetWalletResponseWrapper(
             wallet_result.status_code, wallet_result.status_message, new_args
         )
