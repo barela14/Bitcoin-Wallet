@@ -7,5 +7,6 @@ httpx
 fastapi
 uvicorn
 starlette~=0.16.0
-requests[security] == 2.27.1
+requests[security] ~= 2.27.1
 types-requests
+cryptography
